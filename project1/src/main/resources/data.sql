@@ -8,6 +8,9 @@ VALUES (2, 'raluca', '$2a$12$tZGqj3FEVGEDOrunXeKd5eM0Ssej5b0kdsQCXEv3vjwoKLYZZiK
 INSERT INTO users(id, username, password, role)
 VALUES (3, 'marcel', '$2a$12$eJPyCKwO/hVNB5zV0afQ9uSis3w5/Mt49vYk3mALXbnHYJfRkLDXO', 'client') ON CONFLICT DO NOTHING;
 
+INSERT INTO users(id, username, password, role)
+VALUES (4, 'unnumeinspirat', '$2a$12$mF6.XGgW9Dv/pR3zePlne.6MS9TVOisABpk7XckZvAm0goG7ruEGy', 'client') ON CONFLICT DO NOTHING;
+
 INSERT INTO device(id, address, description, max_h_consumption, users_id)
 VALUES (1, 'Strada Dambovitei, nr.42', 'Device1Raluca', 200, 2) ON CONFLICT DO NOTHING;
 

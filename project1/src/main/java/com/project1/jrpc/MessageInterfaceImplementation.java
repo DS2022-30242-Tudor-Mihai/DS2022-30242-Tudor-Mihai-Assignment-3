@@ -10,10 +10,10 @@ import java.util.List;
 
 @Service
 @AutoJsonRpcServiceImpl
-public class MessageInterfaceImplementation implements MessageInterface{
+public class MessageInterfaceImplementation implements MessageInterface {
 
     private SimpMessagingTemplate simpMessagingTemplate;
-    private HashMap<String, List<String>> chatHistory;
+    private HashMap<String, List<TheMessageToSend>> chatHistory;
 
     public MessageInterfaceImplementation(SimpMessagingTemplate simpMessagingTemplate) {
         this.simpMessagingTemplate = simpMessagingTemplate;
@@ -21,16 +21,36 @@ public class MessageInterfaceImplementation implements MessageInterface{
     }
 
     @Override
-    public void sendMessage(String role, String senderUsername, String receiverUsername, String message) {
-//        if (role.equals("administrator")){
-//            simpMessagingTemplate.convertAndSend("/topic/chat", message);
-//            return ;
-//        }
-//        else if (role.equals("client")){
-//            return ;
-//        }
-//        else{
-//            return null;
-//        }
+    public void sendMessage(String sender, String receiver, String message) {
+        TheMessageToSend theMessageToSend = new TheMessageToSend(sender, receiver, message);
+        if (chatHistory.containsKey(receiver + sender) || chatHistory.containsKey(sender + receiver)) {
+            try {
+                chatHistory.get(receiver + sender).add(theMessageToSend);
+            } catch (Exception e) {
+                chatHistory.get(sender + receiver).add(theMessageToSend);
+            }
+        } else {
+            List<TheMessageToSend> messages = new ArrayList<>();
+            messages.add(theMessageToSend);
+            chatHistory.put(receiver + sender, messages);
+        }
+        simpMessagingTemplate.convertAndSend("/topic/chat", theMessageToSend.toString());
+    }
+
+    @Override
+    public void isTyping(String sender, String receiver) {
+        TheMessageToSend theMessageToSend = new TheMessageToSend(sender, receiver, sender + " is  typing...");
+        simpMessagingTemplate.convertAndSend("/topic/istyping", theMessageToSend);
+    }
+
+    @Override
+    public void heRead(String sender, String receiver) {
+        TheMessageToSend theMessageToSend = new TheMessageToSend(sender, receiver, "The Message Was Read by " + sender);
+        simpMessagingTemplate.convertAndSend("/topic/heread", theMessageToSend.toString());
+    }
+
+    @Override
+    public List<TheMessageToSend> getChat(String username) {
+        return this.chatHistory.get(username);
     }
 }
